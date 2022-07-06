@@ -24,6 +24,3 @@ appendTetromino (Board board) tetro = Board [ [ getCharAtPos board tetro (x,y) |
             | fst ix < 0 || fst ix > (length . head) arr - 1 = (back !! snd abs) !! fst abs 
             | snd ix < 0 || snd ix > length arr - 1 = (back !! snd abs) !! fst abs 
             | otherwise = arr !! snd ix !! fst ix
-    
-updateBoard :: Board -> Tetromino -> Board
-updateBoard board tetro = if tetrominoColliding board tetro then appendTetromino board tetro else board
