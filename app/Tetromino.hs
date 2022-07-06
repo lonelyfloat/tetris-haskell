@@ -4,7 +4,7 @@ type Position = (Int, Int)
 
 data TetrominoShape = TShape | LShape | ZigzagShape | LineShape | SquareShape deriving Enum
 
-data TetrominoRotation = RotatedDefault | RotatedLeft | RotatedDown | RotatedRight 
+data TetrominoRotation = RotatedDefault | RotatedLeft | RotatedDown | RotatedRight deriving (Ord, Eq, Enum, Show)
 
 data Tetromino = Tetromino {
     tetroShape :: TetrominoShape,
