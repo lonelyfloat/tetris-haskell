@@ -21,14 +21,18 @@ removeLines :: Int -> IO ()
 removeLines x = replicateM_ x (putStr "\x1b[1A\x1b[2K")
 
 update :: GameState -> String -> GameState
-update state@(GameState tetro board leave timer) input = state
+update state@(GameState tetro board leave timer) input = 
+    let t = timer + 1 
+        b = if tetrominoColliding board tetro then appendTetromino board tetro else board 
+    in
+    state {activeTetronimo=tetro, board=b, leaveGame = input == "x",timer=t}
 
 render :: GameState -> IO ()
 render (GameState tetro (Board board) _ _) = do
     -- Use escape codes to REMOVE lines
     removeLines (length board)
     -- Temporary - just print the board
-    putStrLn $ show board 
+    print board 
 
 loop :: StateT GameState IO ()
 loop = do
@@ -43,5 +47,4 @@ main :: IO ()
 main = do
     let b = createBoard (10, 20) 
     let tetro = Tetromino TShape RotatedLeft (5,1)
-    let str = show (appendTetromino b tetro)
-    putStrLn str
+    print (appendTetromino b tetro)
