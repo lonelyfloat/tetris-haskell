@@ -1,12 +1,17 @@
+{-# LANGUAGE TupleSections #-}
 module Board where
 
 import Data.List
 import Tetromino
+import Data.Monoid
 
 newtype Board = Board [[Char]]
 
 instance Show Board where
     show (Board board) = unlines board
+
+getBoard :: Board -> [[Char]]
+getBoard (Board b) = b
 
 boardDimensions :: Board -> (Int, Int)
 boardDimensions (Board board) = (length (head board), length board)
@@ -14,8 +19,17 @@ boardDimensions (Board board) = (length (head board), length board)
 createBoard :: (Int, Int) -> Board
 createBoard (x,y) = Board $ replicate y (replicate x ' ')
 
+getIDs :: [[a]] -> [(Int, Int)]
+getIDs mat = concatMap (\ls -> map (,ls) [0..((-1+) . length . head $ mat)]) [0..(length mat - 1)] 
+
 tetrominoColliding :: Board -> Tetromino -> Bool
-tetrominoColliding board tetro = error "Tetromino collision not implemented"
+tetrominoColliding (Board b) tetro@(Tetromino _ _ pos@(tx,ty) ) = getAny (anyAre (map (\ (x,y) -> (tx + x, ty + x) ) tetroIDs) boardIDs)
+  where filterGetIDs xs = filter (\ (x,y) -> xs !! y !! x /= ' ') (getIDs xs)
+        tetroIDs = filterGetIDs . getTetrominoBody $ tetro
+        boardIDs = filterGetIDs b
+        anyAre [] [] = Any False
+        anyAre [] a = Any False
+        anyAre (x:xs) a = Any (x `elem` a || snd x >= length b - 2) <> anyAre xs a
 
 appendTetromino :: Board -> Tetromino -> Board
 appendTetromino (Board board) tetro = Board [ [ getCharAtPos board tetro (x,y) | x <- [0..length (head board) - 1]] | y <- [0..length board - 1] ]

@@ -1,5 +1,7 @@
 module Tetromino where
 
+import qualified Data.Vector as V
+
 type Position = (Int, Int)
 
 data TetrominoShape = TShape | LShape | ZigzagShape | LineShape | SquareShape deriving (Ord, Eq, Enum, Show)
@@ -16,8 +18,8 @@ instance Show Tetromino where
     show tetro = unlines (getTetrominoBody tetro)
 
 -- Complete array of base shapes 
-shapes :: [[String]]
-shapes = [
+shapes :: V.Vector [String]
+shapes = V.fromList [
     ["TTT",
      " T ",
      " T "
@@ -55,6 +57,6 @@ rotateMatrix body RotatedRight = applyTransform body (length body - 1) 0
 
 -- Gets [[Char]] of tetromino (for board) with rotations and everything except position
 getTetrominoBody :: Tetromino -> [[Char]]
-getTetrominoBody tetro = rotateMatrix (shapes !! (fromEnum . tetroShape) tetro) (tetroRotation tetro)
+getTetrominoBody tetro = rotateMatrix (shapes V.! (fromEnum . tetroShape) tetro) (tetroRotation tetro)
 
 
