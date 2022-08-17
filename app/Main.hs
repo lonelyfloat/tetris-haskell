@@ -1,6 +1,7 @@
 module Main where
 
 import Data.List
+import Data.Maybe
 
 import Control.Monad
 import Control.Monad.Trans.State
@@ -17,6 +18,10 @@ data GameState = GameState {
     timer :: Double
     }
 
+data IOData = IOData {
+    strInput :: String,
+    randomT :: Maybe Tetromino
+    }
 removeLines :: Int -> IO ()
 removeLines x = replicateM_ x (putStr "\x1b[1A\x1b[2K")
 
@@ -26,16 +31,17 @@ getTetroRotation tetro input
     | input == "e" = if tetroRotation tetro == RotatedDefault then RotatedRight else toEnum (fromEnum (tetroRotation tetro) - 1)
     | otherwise = tetroRotation tetro
 
-update :: GameState -> String -> GameState
-update state@(GameState tetro board leave timer) input = 
+update :: GameState -> IOData -> GameState
+update state@(GameState tetro board leave timer) (IOData input rand) = 
     let t = timer + 1 
         tet = tetro {
         tetroRotation = getTetroRotation tetro input,
-        tetroPosition = (fst (tetroPosition tetro), snd (tetroPosition tetro) - 1) 
+        tetroPosition = (fst (tetroPosition tetro), snd (tetroPosition tetro) + 1) 
             }
         b = board --if tetrominoColliding board tet then appendTetromino board tetro else board 
+        tetr = if tetrominoColliding board tetro then fromJust rand else tet
     in
-    state {activeTetronimo=tetro, board=b, leaveGame = input == "x",timer=t}
+    state {activeTetronimo=tetr, board=b, leaveGame = input == "x",timer=t}
 
 render :: GameState -> IO ()
 render (GameState tetro (Board board) _ _) = do
@@ -48,7 +54,7 @@ loop :: StateT GameState IO ()
 loop = do
     s <- get 
     let input = ""
-    let st = update s input
+    let st = update s (IOData input Nothing)
     liftIO $ render st
     put st
     unless (leaveGame st) loop

@@ -2,7 +2,7 @@ module Tetromino where
 
 type Position = (Int, Int)
 
-data TetrominoShape = TShape | LShape | ZigzagShape | LineShape | SquareShape deriving Enum
+data TetrominoShape = TShape | LShape | ZigzagShape | LineShape | SquareShape deriving (Ord, Eq, Enum, Show)
 
 data TetrominoRotation = RotatedDefault | RotatedLeft | RotatedDown | RotatedRight deriving (Ord, Eq, Enum, Show)
 
@@ -47,14 +47,14 @@ applyTransform :: [[a]] -> Int -> Int -> [[a]]
 applyTransform ls chx chy = [[ls !! abs (chx - x) !! abs(chy - y) | x <- [0..length ls - 1] ] | y <- [0..length (head ls) - 1]] 
 
 -- Function to rotate a matrix, effectively.
-rotateTetromino :: [[Char]] -> TetrominoRotation -> [[Char]]
-rotateTetromino body RotatedDefault = body
-rotateTetromino body RotatedLeft = applyTransform body 0 (length (head body) - 1)
-rotateTetromino body RotatedDown = reverse body
-rotateTetromino body RotatedRight = applyTransform body (length body - 1) 0
+rotateMatrix :: [[a]] -> TetrominoRotation -> [[a]]
+rotateMatrix body RotatedDefault = body
+rotateMatrix body RotatedLeft = applyTransform body 0 (length (head body) - 1)
+rotateMatrix body RotatedDown = reverse body
+rotateMatrix body RotatedRight = applyTransform body (length body - 1) 0
 
 -- Gets [[Char]] of tetromino (for board) with rotations and everything except position
 getTetrominoBody :: Tetromino -> [[Char]]
-getTetrominoBody tetro = rotateTetromino (shapes !! (fromEnum . tetroShape) tetro) (tetroRotation tetro)
+getTetrominoBody tetro = rotateMatrix (shapes !! (fromEnum . tetroShape) tetro) (tetroRotation tetro)
 
 
