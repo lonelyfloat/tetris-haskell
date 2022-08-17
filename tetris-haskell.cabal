@@ -25,13 +25,10 @@ executable tetris-haskell
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    other-modules: Tetromino, Board
+    -- other-modules:
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
-    build-depends:    base,
-                      transformers,
-                      vector
-
+    build-depends:    base ^>=4.14.3.0
     hs-source-dirs:   app
     default-language: Haskell2010
